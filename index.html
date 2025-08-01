@@ -15,13 +15,13 @@
   </style>
 </head>
 <body>
-  <h1>Hydraulic Lift Runby Checker</h1>
+  <h1>Hydraulic Lift Runby Safety Checker</h1>
   <form id="runbyForm">
     <h2>Top of Lift</h2>
 
-    <label>1. Reserve Ram Travel (inches)</label>
-    <input type="number" id="reserveRam" step="any" />
-    <small>Ram stroke remaining when car rests on compressed buffer. Must be ≥ ½ Bottom Runby (2:1).</small>
+    <label>1. Car to Collision (inches)</label>
+    <input type="number" id="carToCollision" step="any" />
+    <small>Distance from top of lift car to any obstruction in the shaft above it. Used to ensure safe top clearance.</small>
 
     <label>2. Top Ramp to Overtravel Switch (inches)</label>
     <input type="number" id="topRampToSwitch" step="any" />
@@ -56,6 +56,10 @@
     <label>9. Car Apron to Pit Floor (inches)</label>
     <input type="number" id="apronToFloor" step="any" />
     <small>Distance from lowest part of car apron to pit floor when on compressed buffer.</small>
+
+    <label>10. Reserve Ram Travel (inches)</label>
+    <input type="number" id="reserveRam" step="any" />
+    <small>Remaining ram stroke when car rests on buffer. For 2:1, must be ≥ ½ Bottom Runby.</small>
 
     <button type="button" onclick="calculate()">Calculate</button>
   </form>
