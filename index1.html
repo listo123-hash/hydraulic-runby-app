@@ -1,0 +1,136 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hydraulic Runby App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f4f4f4;
+    }
+    h1 {
+      color: #333;
+    }
+    label, select, input {
+      display: block;
+      margin-bottom: 10px;
+    }
+    input[type="number"] {
+      padding: 5px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .safe {
+      background-color: #d4edda;
+      color: #155724;
+      padding: 10px;
+      border-left: 5px solid #28a745;
+    }
+    .unsafe {
+      background-color: #f8d7da;
+      color: #721c24;
+      padding: 10px;
+      border-left: 5px solid #dc3545;
+    }
+    .section {
+      background: #fff;
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    button {
+      padding: 10px 15px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Hydraulic Runby Calculator</h1>
+
+  <div class="section">
+    <label>Reserve Ram Travel (inches)</label>
+    <input type="number" id="ramTravel" />
+
+    <label>Ram Head Clearance (inches)</label>
+    <input type="number" id="ramClearance" />
+
+    <label>Sill to Sill Distance (inches)</label>
+    <input type="number" id="sillDistance" />
+
+    <label>Ramp to Over-travel Switch (inches)</label>
+    <input type="number" id="rampToSwitch" />
+
+    <label>Top Travel Clearance (inches)</label>
+    <input type="number" id="topClearance" />
+
+    <label>Bottom Over-travel (inches)</label>
+    <input type="number" id="bottomOverTravel" />
+
+    <label>Bottom Runby Clearance (inches)</label>
+    <input type="number" id="bottomRunby" />
+
+    <label>Car to Buffer Distance (inches)</label>
+    <input type="number" id="carToBuffer" />
+
+    <label>Buffer Compression</label>
+    <select id="bufferCompression">
+      <option value="0.5">50% (Spring)</option>
+      <option value="0.9">90% (Polyurethane)</option>
+    </select>
+
+    <label>Apron to Pit Floor (inches)</label>
+    <input type="number" id="apronToPit" />
+
+    <button onclick="calculate()">Calculate</button>
+  </div>
+
+  <div id="results"></div>
+
+  <script>
+    function calculate() {
+      const rampToSwitch = parseFloat(document.getElementById('rampToSwitch').value);
+      const topClearance = parseFloat(document.getElementById('topClearance').value);
+      const bottomOverTravel = parseFloat(document.getElementById('bottomOverTravel').value);
+      const bottomRunby = parseFloat(document.getElementById('bottomRunby').value);
+      const carToBuffer = parseFloat(document.getElementById('carToBuffer').value);
+      const bufferCompression = parseFloat(document.getElementById('bufferCompression').value);
+
+      const topRunby = topClearance / 2;
+      const calculatedBottomRunby = carToBuffer * bufferCompression;
+
+      let resultText = '';
+
+      let topSafe = rampToSwitch <= topRunby;
+      let bottomSafe = bottomOverTravel <= calculatedBottomRunby;
+
+      if (topSafe && bottomSafe) {
+        resultText += `<div class="safe"><strong>Safe:</strong> All measurements are within tolerance.</div>`;
+      } else {
+        resultText += `<div class="unsafe"><strong>Unsafe:</strong><ul>`;
+        if (!topSafe) {
+          resultText += `<li>Top travel exceeds safe 2:1 runby. Ramp-to-switch (${rampToSwitch}") > Half of top clearance (${topRunby.toFixed(2)}")</li>`;
+        }
+        if (!bottomSafe) {
+          resultText += `<li>Bottom over-travel exceeds allowable runby. Bottom over-travel (${bottomOverTravel}") > Calculated runby (${calculatedBottomRunby.toFixed(2)}")</li>`;
+        }
+        resultText += `</ul></div>`;
+      }
+
+      resultText += `<div class="section">
+        <p><strong>Top 2:1 Runby (Half of Top Clearance):</strong> ${topRunby.toFixed(2)}"</p>
+        <p><strong>Calculated Bottom Runby (2:1):</strong> ${calculatedBottomRunby.toFixed(2)}"</p>
+      </div>`;
+
+      document.getElementById('results').innerHTML = resultText;
+    }
+  </script>
+</body>
+</html>
