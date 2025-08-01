@@ -21,41 +21,41 @@
 
     <label>1. Top Ramp to Overtravel Switch (inches)</label>
     <input type="number" id="topRampToSwitch" step="any" />
-    <small>Measure from the top final ramp (physical end stop) to the overtravel switch above the car.</small>
+    <small>Distance from top ramp to switch. Used as Overtravel measurement.</small>
 
     <label>2. Top Sill-to-Sill (inches)</label>
     <input type="number" id="topSillToSill" step="any" />
-    <small>Distance from top car sill to top landing sill when lift is at rest.</small>
+    <small>Distance from car sill to landing sill at the top floor.</small>
 
-    <label>3. Ram Head Further Travel (inches)</label>
+    <label>3. Ram Head Clearance (inches)</label>
     <input type="number" id="ramHeadFurther" step="any" />
-    <small>Clearance between the top of the ram and car frame when lift is at full top. Must be ≥ (Top Overtravel × ½) + 4".</small>
+    <small>Clearance between top of ram and car frame at full extension. Must be ≥ ½ Overtravel + 4".</small>
 
     <h2>Bottom of Lift</h2>
 
     <label>4. Bottom Ramp to Overtravel Switch (inches)</label>
     <input type="number" id="bottomRampToSwitch" step="any" />
-    <small>Measure from bottom ramp (buffer strike plate) to the overtravel switch mounted under the car.</small>
+    <small>Distance from bottom ramp to the underside overtravel switch on car. This is the Bottom Overtravel.</small>
 
     <label>5. Bottom Sill-to-Sill (inches)</label>
     <input type="number" id="bottomSillToSill" step="any" />
-    <small>Distance from bottom landing sill to car sill when at rest at the bottom floor.</small>
+    <small>Distance between car sill and landing sill at lowest floor.</small>
 
     <label>6. Car to Buffer Distance (inches)</label>
     <input type="number" id="carToBuffer" step="any" />
-    <small>Distance from the underside of the car to the buffer top.</small>
+    <small>Distance from car underside to buffer top.</small>
 
     <label>7. Buffer Compression (inches)</label>
     <input type="number" id="bufferCompression" step="any" />
-    <small>Maximum allowed buffer compression (based on manufacturer/type).</small>
+    <small>Expected max buffer compression when fully loaded (polyurethane/spring type).</small>
 
     <label>8. Reserve Ram Travel (inches)</label>
     <input type="number" id="reserveRam" step="any" />
-    <small>Amount of ram stroke left when car is on the buffer. Must be ≥ ½ bottom runby (2:1 logic).</small>
+    <small>Ram stroke remaining when car rests on compressed buffer. Must be ≥ ½ Bottom Runby (2:1).</small>
 
     <label>9. Car Apron to Pit Floor (inches)</label>
     <input type="number" id="apronToFloor" step="any" />
-    <small>Clearance from the lowest part of the car (apron) to pit floor while car is resting on compressed buffer.</small>
+    <small>Distance from lowest part of car apron to pit floor when on compressed buffer.</small>
 
     <button type="button" onclick="calculate()">Calculate</button>
   </form>
@@ -74,35 +74,44 @@
       const reserveRam = parseFloat(document.getElementById('reserveRam').value);
       const apronToFloor = parseFloat(document.getElementById('apronToFloor').value);
 
+      const topOvertravel = topRampToSwitch;
       const topRunby = topSill - topRampToSwitch;
+      const bottomOvertravel = bottomRampToSwitch;
       const bottomRunby = bottomSill - (carToBuffer - bufferCompression);
+      const requiredRamHead = (topOvertravel / 2) + 4;
+      const requiredReserveRam = bottomRunby / 2;
 
-      let result = "";
+      let result = `<h2>Calculated Values:</h2>`;
+      result += `<p><strong>Top Overtravel:</strong> ${topOvertravel.toFixed(2)} inches</p>`;
+      result += `<p><strong>Top Runby:</strong> ${topRunby.toFixed(2)} inches</p>`;
+      result += `<p><strong>Bottom Overtravel:</strong> ${bottomOvertravel.toFixed(2)} inches</p>`;
+      result += `<p><strong>Bottom Runby:</strong> ${bottomRunby.toFixed(2)} inches</p>`;
+
       let allPass = true;
 
-      if (reserveRam < bottomRunby / 2) {
-        result += "<p class='fail'>❌ Reserve Ram Travel is too short.</p>";
+      if (reserveRam < requiredReserveRam) {
+        result += `<p class='fail'>❌ Reserve Ram Travel too short. Required: ${requiredReserveRam.toFixed(2)}", Entered: ${reserveRam}"</p>`;
         allPass = false;
       }
-      if (ramHead < (topRampToSwitch / 2 + 4)) {
-        result += "<p class='fail'>❌ Ram Head Further Travel is insufficient.</p>";
+      if (ramHead < requiredRamHead) {
+        result += `<p class='fail'>❌ Ram Head Clearance too small. Required: ${requiredRamHead.toFixed(2)}", Entered: ${ramHead}"</p>`;
         allPass = false;
       }
       if (topRampToSwitch > topRunby) {
-        result += "<p class='fail'>❌ Top Overtravel exceeds Top Runby.</p>";
+        result += `<p class='fail'>❌ Top Overtravel exceeds Top Runby. Runby must be longer than Overtravel.</p>`;
         allPass = false;
       }
       if (bottomRampToSwitch > bottomRunby) {
-        result += "<p class='fail'>❌ Bottom Overtravel exceeds Bottom Runby.</p>";
+        result += `<p class='fail'>❌ Bottom Overtravel exceeds Bottom Runby. Runby must be longer than Overtravel.</p>`;
         allPass = false;
       }
       if (apronToFloor < bufferCompression) {
-        result += "<p class='fail'>❌ Apron to Floor clearance is less than Buffer Compression.</p>";
+        result += `<p class='fail'>❌ Apron to Floor clearance too small. Must be more than Buffer Compression.</p>`;
         allPass = false;
       }
 
       if (allPass) {
-        result = "<p class='pass'>✅ All checks passed. Lift condition is safe.</p>";
+        result += `<p class='pass'>✅ All checks passed. Lift condition is safe.</p>`;
       }
 
       document.getElementById("result").innerHTML = result;
