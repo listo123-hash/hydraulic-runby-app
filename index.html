@@ -73,4 +73,54 @@
       const topSill = parseFloat(document.getElementById('topSillToSill').value);
       const ramHead = parseFloat(document.getElementById('ramHeadFurther').value);
       const reserveRam = parseFloat(document.getElementById('reserveRam').value);
-      const bottomRampToSwitch = parseFloat(document
+      const bottomRampToSwitch = parseFloat(document.getElementById('bottomRampToSwitch').value);
+      const bottomSill = parseFloat(document.getElementById('bottomSillToSill').value);
+      const carToBuffer = parseFloat(document.getElementById('carToBuffer').value);
+      const bufferCompression = parseFloat(document.getElementById('bufferCompression').value);
+      const apronToFloor = parseFloat(document.getElementById('apronToFloor').value);
+
+      const topOvertravel = topRampToSwitch;
+      const topRunby = topSill - topRampToSwitch;
+      const bottomOvertravel = bottomRampToSwitch;
+      const bottomRunby = bottomSill - (carToBuffer - bufferCompression);
+      const requiredRamHead = (topOvertravel / 2) + 4;
+      const requiredReserveRam = bottomRunby / 2;
+
+      let result = `<h2>Calculated Values:</h2>`;
+      result += `<p><strong>Top Overtravel:</strong> ${topOvertravel.toFixed(2)} inches</p>`;
+      result += `<p><strong>Top Runby:</strong> ${topRunby.toFixed(2)} inches</p>`;
+      result += `<p><strong>Bottom Overtravel:</strong> ${bottomOvertravel.toFixed(2)} inches</p>`;
+      result += `<p><strong>Bottom Runby:</strong> ${bottomRunby.toFixed(2)} inches</p>`;
+
+      let allPass = true;
+
+      if (reserveRam < requiredReserveRam) {
+        result += `<p class='fail'>❌ Reserve Ram Travel too short. Required: ${requiredReserveRam.toFixed(2)}", Entered: ${reserveRam}"</p>`;
+        allPass = false;
+      }
+      if (ramHead < requiredRamHead) {
+        result += `<p class='fail'>❌ Ram Head Clearance too small. Required: ${requiredRamHead.toFixed(2)}", Entered: ${ramHead}"</p>`;
+        allPass = false;
+      }
+      if (topRampToSwitch > topRunby) {
+        result += `<p class='fail'>❌ Top Overtravel exceeds Top Runby. Runby must be longer than Overtravel.</p>`;
+        allPass = false;
+      }
+      if (bottomRampToSwitch > bottomRunby) {
+        result += `<p class='fail'>❌ Bottom Overtravel exceeds Bottom Runby. Runby must be longer than Overtravel.</p>`;
+        allPass = false;
+      }
+      if (apronToFloor < bufferCompression) {
+        result += `<p class='fail'>❌ Apron to Floor clearance too small. Must be more than Buffer Compression.</p>`;
+        allPass = false;
+      }
+
+      if (allPass) {
+        result += `<p class='pass'>✅ All checks passed. Lift condition is safe.</p>`;
+      }
+
+      document.getElementById("result").innerHTML = result;
+    }
+  </script>
+</body>
+</html>
