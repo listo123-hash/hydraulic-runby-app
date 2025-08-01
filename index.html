@@ -1,48 +1,95 @@
-
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Hydraulic Runby Calculator</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-        body { font-family: Arial; padding: 20px; max-width: 600px; margin: auto; background: #f7f7f7; }
-        h1 { text-align: center; }
-        label { display: block; margin-top: 15px; }
-        input[type="number"] { width: 100%; padding: 8px; box-sizing: border-box; }
-        button { margin-top: 20px; padding: 10px; width: 100%; background: #007bff; color: white; border: none; font-size: 16px; }
-        #results { margin-top: 20px; padding: 10px; background: white; border: 1px solid #ccc; }
-    </style>
+  <meta charset="UTF-8">
+  <title>Hydraulic Runby Checker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f9f9f9;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 15px;
+    }
+    th, td {
+      padding: 8px;
+      border: 1px solid #ccc;
+    }
+    input[type="number"] {
+      width: 100px;
+    }
+    .safe {
+      background-color: #c8e6c9; /* green */
+    }
+    .unsafe {
+      background-color: #ffcdd2; /* red */
+    }
+    .instructions {
+      font-size: 0.9em;
+      color: #555;
+    }
+  </style>
 </head>
 <body>
-    <h1>Hydraulic Runby Calculator</h1>
-    <label>Top Floor to Underside of Beam (in)</label>
-    <input type="number" id="topFloorToBeam" step="any">
+  <h1>Hydraulic Lift Runby Calculator</h1>
 
-    <label>Sill to Sill (in)</label>
-    <input type="number" id="sillToSill" step="any">
+  <form id="runbyForm">
+    <table>
+      <tr><th>Measurement</th><th>Value (inches)</th><th>Instructions</th></tr>
+      <tr><td>Reserve Ram Travel</td><td><input type="number" name="ramTravel"></td><td class="instructions">Lower car to bottom floor. Measure visible ram or tide mark.</td></tr>
+      <tr><td>Ram Head Clearance</td><td><input type="number" name="ramHead"></td><td class="instructions">Raise to top floor. Must exceed ½ ramp-to-switch + 4".</td></tr>
+      <tr><td>Sill to Sill Distance</td><td><input type="number" name="sillToSill"></td><td class="instructions">Top landing sill to car sill at bottom floor.</td></tr>
+      <tr><td>Ramp to Over-travel Switch</td><td><input type="number" name="rampToSwitch"></td><td class="instructions">Ramp to over-travel switch on guide rail.</td></tr>
+      <tr><td>Top Runby Clearance</td><td><input type="number" name="topRunby"></td><td class="instructions">Physical clearance above top landing.</td></tr>
+      <tr><td>Bottom Over-travel</td><td><input type="number" name="bottomOvertravel"></td><td class="instructions">How far car travels past lowest landing (to switch if fitted).</td></tr>
+      <tr><td>Bottom Runby Clearance</td><td><input type="number" name="bottomRunby"></td><td class="instructions">From underside of car to top of buffer in pit.</td></tr>
+      <tr><td>Car to Buffer Distance</td><td><input type="number" name="carToBuffer"></td><td class="instructions">Car sill to buffer top at lowest floor.</td></tr>
+      <tr><td>Buffer Compression</td><td><input type="number" name="bufferCompression"></td><td class="instructions">Estimate: 50% spring or 90% polyurethane.</td></tr>
+      <tr><td>Apron to Pit Floor</td><td><input type="number" name="apronToPit"></td><td class="instructions">Car apron to pit floor (while car is on buffer).</td></tr>
+    </table>
 
-    <label>Top Overtravel Switch to Beam (in)</label>
-    <input type="number" id="topOvertravelToBeam" step="any">
+    <button type="button" onclick="calculate()">Calculate</button>
+  </form>
 
-    <label>Bottom Floor to Pit Floor (in)</label>
-    <input type="number" id="bottomFloorToPit" step="any">
+  <div id="results"></div>
 
-    <label>Bottom Overtravel Switch to Pit Floor (in)</label>
-    <input type="number" id="bottomOvertravelToPit" step="any">
+  <script>
+    function calculate() {
+      const form = document.forms['runbyForm'];
+      const rampToSwitch = parseFloat(form['rampToSwitch'].value);
+      const bottomRunby = parseFloat(form['bottomRunby'].value);
+      const bottomOvertravel = parseFloat(form['bottomOvertravel'].value);
 
-    <label>Reserve Ram Travel (in)</label>
-    <input type="number" id="reserveRamTravel" step="any">
+      const calculatedBottomRunby = rampToSwitch / 2;
+      const topSafe = rampToSwitch < bottomRunby;
+      const bottomSafe = bottomOvertravel < bottomRunby;
 
-    <label>Ram Head Clearance (in)</label>
-    <input type="number" id="ramHeadClearance" step="any">
+      let result = `
+        <h2>Results</h2>
+        <table>
+          <tr><th>Check</th><th>Result</th><th>Details</th></tr>
+          <tr class="${topSafe ? 'safe' : 'unsafe'}">
+            <td>Top Travel Safe?</td>
+            <td>${topSafe ? '✅ SAFE' : '❌ UNSAFE'}</td>
+            <td>Ramp-to-switch (${rampToSwitch}") must be &lt; bottom runby (${bottomRunby}")</td>
+          </tr>
+          <tr class="${bottomSafe ? 'safe' : 'unsafe'}">
+            <td>Bottom Travel Safe?</td>
+            <td>${bottomSafe ? '✅ SAFE' : '❌ UNSAFE'}</td>
+            <td>Bottom over-travel (${bottomOvertravel}") must be &lt; bottom runby (${bottomRunby}")</td>
+          </tr>
+          <tr>
+            <td>Calculated Bottom Runby (2:1)</td>
+            <td colspan="2">${calculatedBottomRunby.toFixed(2)}"</td>
+          </tr>
+        </table>
+      `;
 
-    <label>Apron to Pit Floor (in)</label>
-    <input type="number" id="apronToPitFloor" step="any">
-
-    <button onclick="calculate()">Calculate Runby</button>
-
-    <div id="results"></div>
-
-    <script src="script.js"></script>
+      document.getElementById('results').innerHTML = result;
+    }
+  </script>
 </body>
 </html>
