@@ -8,7 +8,7 @@
     body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.5; }
     h2 { margin-top: 30px; color: #004080; }
     label { font-weight: bold; display: block; margin-top: 10px; }
-    input, select { width: 100%; padding: 5px; margin: 5px 0 10px 0; }
+    input { width: 100%; padding: 5px; margin-bottom: 10px; }
     #result { margin-top: 20px; padding: 10px; border: 1px solid #ccc; }
     .pass { color: green; font-weight: bold; }
     .fail { color: red; font-weight: bold; }
@@ -16,50 +16,51 @@
 </head>
 <body>
   <h1>Hydraulic Lift Runby Safety Checker</h1>
+
   <form id="runbyForm">
     <h2>Top of Lift</h2>
 
     <label>1. Car to Collision (inches)</label>
     <input type="number" id="carToCollision" step="any" />
-    <small>Distance from top of lift car to any obstruction in the shaft above it. Used to ensure safe top clearance.</small>
+    <small>Distance from top of car to any obstruction above (roof steel, crosshead etc).</small>
 
     <label>2. Top Ramp to Overtravel Switch (inches)</label>
     <input type="number" id="topRampToSwitch" step="any" />
-    <small>Distance from top ramp to switch. Used as Overtravel measurement.</small>
+    <small>Distance from ramp to the overtravel switch above the car.</small>
 
     <label>3. Top Sill-to-Sill (inches)</label>
     <input type="number" id="topSillToSill" step="any" />
-    <small>Distance from top landing sill to lift car sill at the same floor level.</small>
+    <small>Distance from top landing sill to lift car sill at the same level.</small>
 
     <label>4. Ram Head Clearance (inches)</label>
     <input type="number" id="ramHeadFurther" step="any" />
-    <small>Clearance between top of ram and car frame at full extension. Must be ≥ ½ Overtravel + 4".</small>
+    <small>Clearance between top of ram and underside of car crossbeam. Must be ≥ ½ top overtravel + 4”.</small>
 
     <h2>Bottom of Lift</h2>
 
     <label>5. Bottom Ramp to Overtravel Switch (inches)</label>
     <input type="number" id="bottomRampToSwitch" step="any" />
-    <small>Distance from bottom ramp to the underside overtravel switch on car. This is the Bottom Overtravel.</small>
+    <small>Distance from the bottom ramp to the underside overtravel switch.</small>
 
     <label>6. Bottom Sill-to-Sill (inches)</label>
     <input type="number" id="bottomSillToSill" step="any" />
-    <small>Distance from top landing sill to lift car sill at the same floor level.</small>
+    <small>Distance from top landing sill to bottom of car sill at lower level.</small>
 
     <label>7. Car to Buffer Distance (inches)</label>
     <input type="number" id="carToBuffer" step="any" />
-    <small>Distance from car underside to buffer top.</small>
+    <small>Distance from underside of car to buffer top in rest position.</small>
 
     <label>8. Buffer Compression (inches)</label>
     <input type="number" id="bufferCompression" step="any" />
-    <small>Expected max buffer compression when fully loaded (polyurethane/spring type).</small>
+    <small>Expected maximum buffer compression under full load (e.g. 2.7" for 3" poly).</small>
 
     <label>9. Car Apron to Pit Floor (inches)</label>
     <input type="number" id="apronToFloor" step="any" />
-    <small>Distance from lowest part of car apron to pit floor when on compressed buffer.</small>
+    <small>Distance from bottom of car apron to pit floor while on buffer.</small>
 
     <label>10. Reserve Ram Travel (inches)</label>
     <input type="number" id="reserveRam" step="any" />
-    <small>Remaining ram stroke when car rests on buffer. For 2:1, must be ≥ ½ Bottom Runby.</small>
+    <small>Remaining usable ram stroke while car is resting on compressed buffer (for 2:1 it must be ≥ half bottom runby).</small>
 
     <button type="button" onclick="calculate()">Calculate</button>
   </form>
