@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Hydraulic Runby App</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
+    body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.5; }
+    h2 { margin-top: 30px; color: #004080; }
     label { font-weight: bold; display: block; margin-top: 10px; }
     input, select { width: 100%; padding: 5px; margin: 5px 0 10px 0; }
     #result { margin-top: 20px; padding: 10px; border: 1px solid #ccc; }
@@ -16,41 +17,45 @@
 <body>
   <h1>Hydraulic Lift Runby Checker</h1>
   <form id="runbyForm">
-    <label>1. Reserve Ram Travel (inches)</label>
-    <input type="number" id="reserveRam" step="any" />
-    <small>Measure remaining ram stroke at full bottom. Must be ≥ ½ bottom runby (adjusted for 2:1).</small>
+    <h2>Top of Lift</h2>
 
-    <label>2. Ram Head Further Travel (inches)</label>
-    <input type="number" id="ramHeadFurther" step="any" />
-    <small>Clearance between ram head and underside of car frame. Must be ≥ top overtravel × ½ + 4".</small>
-
-    <label>3. Top Ramp to Overtravel Switch (inches)</label>
+    <label>1. Top Ramp to Overtravel Switch (inches)</label>
     <input type="number" id="topRampToSwitch" step="any" />
-    <small>Measure from top final ramp to overtravel switch.</small>
+    <small>Measure from the top final ramp (physical end stop) to the overtravel switch above the car.</small>
 
-    <label>4. Top Sill-to-Sill (inches)</label>
+    <label>2. Top Sill-to-Sill (inches)</label>
     <input type="number" id="topSillToSill" step="any" />
-    <small>Top landing sill to top car sill (car at rest).</small>
+    <small>Distance from top car sill to top landing sill when lift is at rest.</small>
 
-    <label>5. Bottom Ramp to Overtravel Switch (inches)</label>
+    <label>3. Ram Head Further Travel (inches)</label>
+    <input type="number" id="ramHeadFurther" step="any" />
+    <small>Clearance between the top of the ram and car frame when lift is at full top. Must be ≥ (Top Overtravel × ½) + 4".</small>
+
+    <h2>Bottom of Lift</h2>
+
+    <label>4. Bottom Ramp to Overtravel Switch (inches)</label>
     <input type="number" id="bottomRampToSwitch" step="any" />
-    <small>Measure from bottom ramp to overtravel switch underneath car.</small>
+    <small>Measure from bottom ramp (buffer strike plate) to the overtravel switch mounted under the car.</small>
 
-    <label>6. Bottom Sill-to-Sill (inches)</label>
+    <label>5. Bottom Sill-to-Sill (inches)</label>
     <input type="number" id="bottomSillToSill" step="any" />
-    <small>Bottom landing sill to bottom car sill (car at rest).</small>
+    <small>Distance from bottom landing sill to car sill when at rest at the bottom floor.</small>
 
-    <label>7. Car Apron to Pit Floor (inches)</label>
-    <input type="number" id="apronToFloor" step="any" />
-    <small>Clearance from car apron to pit floor while car is on buffer.</small>
-
-    <label>8. Car to Buffer Distance (inches)</label>
+    <label>6. Car to Buffer Distance (inches)</label>
     <input type="number" id="carToBuffer" step="any" />
-    <small>Distance from underside of car to top of buffer.</small>
+    <small>Distance from the underside of the car to the buffer top.</small>
 
-    <label>9. Buffer Compression (inches)</label>
+    <label>7. Buffer Compression (inches)</label>
     <input type="number" id="bufferCompression" step="any" />
-    <small>Maximum buffer compression allowed.</small>
+    <small>Maximum allowed buffer compression (based on manufacturer/type).</small>
+
+    <label>8. Reserve Ram Travel (inches)</label>
+    <input type="number" id="reserveRam" step="any" />
+    <small>Amount of ram stroke left when car is on the buffer. Must be ≥ ½ bottom runby (2:1 logic).</small>
+
+    <label>9. Car Apron to Pit Floor (inches)</label>
+    <input type="number" id="apronToFloor" step="any" />
+    <small>Clearance from the lowest part of the car (apron) to pit floor while car is resting on compressed buffer.</small>
 
     <button type="button" onclick="calculate()">Calculate</button>
   </form>
@@ -59,15 +64,15 @@
 
   <script>
     function calculate() {
-      const reserveRam = parseFloat(document.getElementById('reserveRam').value);
-      const ramHead = parseFloat(document.getElementById('ramHeadFurther').value);
       const topRampToSwitch = parseFloat(document.getElementById('topRampToSwitch').value);
       const topSill = parseFloat(document.getElementById('topSillToSill').value);
+      const ramHead = parseFloat(document.getElementById('ramHeadFurther').value);
       const bottomRampToSwitch = parseFloat(document.getElementById('bottomRampToSwitch').value);
       const bottomSill = parseFloat(document.getElementById('bottomSillToSill').value);
-      const apronToFloor = parseFloat(document.getElementById('apronToFloor').value);
       const carToBuffer = parseFloat(document.getElementById('carToBuffer').value);
       const bufferCompression = parseFloat(document.getElementById('bufferCompression').value);
+      const reserveRam = parseFloat(document.getElementById('reserveRam').value);
+      const apronToFloor = parseFloat(document.getElementById('apronToFloor').value);
 
       const topRunby = topSill - topRampToSwitch;
       const bottomRunby = bottomSill - (carToBuffer - bufferCompression);
@@ -97,7 +102,7 @@
       }
 
       if (allPass) {
-        result = "<p class='pass'>✅ All checks passed. Safe to operate.</p>";
+        result = "<p class='pass'>✅ All checks passed. Lift condition is safe.</p>";
       }
 
       document.getElementById("result").innerHTML = result;
