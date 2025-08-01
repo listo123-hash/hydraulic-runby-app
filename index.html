@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,130 +5,102 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Hydraulic Runby App</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      background: #f4f4f4;
-    }
-    h1 {
-      color: #333;
-    }
-    label, select, input {
-      display: block;
-      margin-bottom: 10px;
-    }
-    input[type="number"] {
-      padding: 5px;
-      width: 100%;
-      box-sizing: border-box;
-    }
-    .safe {
-      background-color: #d4edda;
-      color: #155724;
-      padding: 10px;
-      border-left: 5px solid #28a745;
-    }
-    .unsafe {
-      background-color: #f8d7da;
-      color: #721c24;
-      padding: 10px;
-      border-left: 5px solid #dc3545;
-    }
-    .section {
-      background: #fff;
-      padding: 15px;
-      border-radius: 6px;
-      margin-bottom: 20px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
-    }
-    button {
-      padding: 10px 15px;
-      background: #007bff;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      font-size: 16px;
-    }
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    label { font-weight: bold; display: block; margin-top: 10px; }
+    input, select { width: 100%; padding: 5px; margin: 5px 0 10px 0; }
+    #result { margin-top: 20px; padding: 10px; border: 1px solid #ccc; }
+    .pass { color: green; font-weight: bold; }
+    .fail { color: red; font-weight: bold; }
   </style>
 </head>
 <body>
-  <h1>Hydraulic Runby Calculator</h1>
+  <h1>Hydraulic Lift Runby Checker</h1>
+  <form id="runbyForm">
+    <label>1. Reserve Ram Travel (inches)</label>
+    <input type="number" id="reserveRam" step="any" />
+    <small>Measure remaining ram stroke at full bottom. Must be ≥ ½ bottom runby (adjusted for 2:1).</small>
 
-  <div class="section">
-    <label>Reserve Ram Travel (inches)</label>
-    <input type="number" id="ramTravel" />
+    <label>2. Ram Head Further Travel (inches)</label>
+    <input type="number" id="ramHeadFurther" step="any" />
+    <small>Clearance between ram head and underside of car frame. Must be ≥ top overtravel × ½ + 4".</small>
 
-    <label>Ram Head Clearance (inches)</label>
-    <input type="number" id="ramClearance" />
+    <label>3. Top Ramp to Overtravel Switch (inches)</label>
+    <input type="number" id="topRampToSwitch" step="any" />
+    <small>Measure from top final ramp to overtravel switch.</small>
 
-    <label>Sill to Sill Distance (inches)</label>
-    <input type="number" id="sillDistance" />
+    <label>4. Top Sill-to-Sill (inches)</label>
+    <input type="number" id="topSillToSill" step="any" />
+    <small>Top landing sill to top car sill (car at rest).</small>
 
-    <label>Ramp to Over-travel Switch (inches)</label>
-    <input type="number" id="rampToSwitch" />
+    <label>5. Bottom Ramp to Overtravel Switch (inches)</label>
+    <input type="number" id="bottomRampToSwitch" step="any" />
+    <small>Measure from bottom ramp to overtravel switch underneath car.</small>
 
-    <label>Top Travel Clearance (inches)</label>
-    <input type="number" id="topClearance" />
+    <label>6. Bottom Sill-to-Sill (inches)</label>
+    <input type="number" id="bottomSillToSill" step="any" />
+    <small>Bottom landing sill to bottom car sill (car at rest).</small>
 
-    <label>Bottom Over-travel (inches)</label>
-    <input type="number" id="bottomOverTravel" />
+    <label>7. Car Apron to Pit Floor (inches)</label>
+    <input type="number" id="apronToFloor" step="any" />
+    <small>Clearance from car apron to pit floor while car is on buffer.</small>
 
-    <label>Bottom Runby Clearance (inches)</label>
-    <input type="number" id="bottomRunby" />
+    <label>8. Car to Buffer Distance (inches)</label>
+    <input type="number" id="carToBuffer" step="any" />
+    <small>Distance from underside of car to top of buffer.</small>
 
-    <label>Car to Buffer Distance (inches)</label>
-    <input type="number" id="carToBuffer" />
+    <label>9. Buffer Compression (inches)</label>
+    <input type="number" id="bufferCompression" step="any" />
+    <small>Maximum buffer compression allowed.</small>
 
-    <label>Buffer Compression</label>
-    <select id="bufferCompression">
-      <option value="0.5">50% (Spring)</option>
-      <option value="0.9">90% (Polyurethane)</option>
-    </select>
+    <button type="button" onclick="calculate()">Calculate</button>
+  </form>
 
-    <label>Apron to Pit Floor (inches)</label>
-    <input type="number" id="apronToPit" />
-
-    <button onclick="calculate()">Calculate</button>
-  </div>
-
-  <div id="results"></div>
+  <div id="result"></div>
 
   <script>
     function calculate() {
-      const rampToSwitch = parseFloat(document.getElementById('rampToSwitch').value);
-      const topClearance = parseFloat(document.getElementById('topClearance').value);
-      const bottomOverTravel = parseFloat(document.getElementById('bottomOverTravel').value);
-      const bottomRunby = parseFloat(document.getElementById('bottomRunby').value);
+      const reserveRam = parseFloat(document.getElementById('reserveRam').value);
+      const ramHead = parseFloat(document.getElementById('ramHeadFurther').value);
+      const topRampToSwitch = parseFloat(document.getElementById('topRampToSwitch').value);
+      const topSill = parseFloat(document.getElementById('topSillToSill').value);
+      const bottomRampToSwitch = parseFloat(document.getElementById('bottomRampToSwitch').value);
+      const bottomSill = parseFloat(document.getElementById('bottomSillToSill').value);
+      const apronToFloor = parseFloat(document.getElementById('apronToFloor').value);
       const carToBuffer = parseFloat(document.getElementById('carToBuffer').value);
       const bufferCompression = parseFloat(document.getElementById('bufferCompression').value);
 
-      const topRunby = topClearance / 2;
-      const calculatedBottomRunby = carToBuffer * bufferCompression;
+      const topRunby = topSill - topRampToSwitch;
+      const bottomRunby = bottomSill - (carToBuffer - bufferCompression);
 
-      let resultText = '';
+      let result = "";
+      let allPass = true;
 
-      let topSafe = rampToSwitch <= topRunby;
-      let bottomSafe = bottomOverTravel <= calculatedBottomRunby;
-
-      if (topSafe && bottomSafe) {
-        resultText += `<div class="safe"><strong>Safe:</strong> All measurements are within tolerance.</div>`;
-      } else {
-        resultText += `<div class="unsafe"><strong>Unsafe:</strong><ul>`;
-        if (!topSafe) {
-          resultText += `<li>Top travel exceeds safe 2:1 runby. Ramp-to-switch (${rampToSwitch}") > Half of top clearance (${topRunby.toFixed(2)}")</li>`;
-        }
-        if (!bottomSafe) {
-          resultText += `<li>Bottom over-travel exceeds allowable runby. Bottom over-travel (${bottomOverTravel}") > Calculated runby (${calculatedBottomRunby.toFixed(2)}")</li>`;
-        }
-        resultText += `</ul></div>`;
+      if (reserveRam < bottomRunby / 2) {
+        result += "<p class='fail'>❌ Reserve Ram Travel is too short.</p>";
+        allPass = false;
+      }
+      if (ramHead < (topRampToSwitch / 2 + 4)) {
+        result += "<p class='fail'>❌ Ram Head Further Travel is insufficient.</p>";
+        allPass = false;
+      }
+      if (topRampToSwitch > topRunby) {
+        result += "<p class='fail'>❌ Top Overtravel exceeds Top Runby.</p>";
+        allPass = false;
+      }
+      if (bottomRampToSwitch > bottomRunby) {
+        result += "<p class='fail'>❌ Bottom Overtravel exceeds Bottom Runby.</p>";
+        allPass = false;
+      }
+      if (apronToFloor < bufferCompression) {
+        result += "<p class='fail'>❌ Apron to Floor clearance is less than Buffer Compression.</p>";
+        allPass = false;
       }
 
-      resultText += `<div class="section">
-        <p><strong>Top 2:1 Runby (Half of Top Clearance):</strong> ${topRunby.toFixed(2)}"</p>
-        <p><strong>Calculated Bottom Runby (2:1):</strong> ${calculatedBottomRunby.toFixed(2)}"</p>
-      </div>`;
+      if (allPass) {
+        result = "<p class='pass'>✅ All checks passed. Safe to operate.</p>";
+      }
 
-      document.getElementById('results').innerHTML = resultText;
+      document.getElementById("result").innerHTML = result;
     }
   </script>
 </body>
